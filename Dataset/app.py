@@ -13,11 +13,10 @@ import os
 #     gdown.download(url, MODEL_PATH, quiet=False)
 
 # Load model
-# model = load_model("deepfake_model.h5")
+model = load_model("deepfake_model.h5")
 
 #converted_model
-
-model = load_model("deepfake_model_fixed.keras")
+# model = load_model("deepfake_model_fixed.keras")
 
 # Load face detector
 face_cascade = cv2.CascadeClassifier(
