@@ -13,7 +13,36 @@ import os
 #     gdown.download(url, MODEL_PATH, quiet=False)
 
 # Load model
-model = load_model("deepfake_model.h5")
+# model = load_model("deepfake_model.h5")
+
+#new load model
+
+import h5py, json
+
+def load_model_compatible(path):
+    with h5py.File(path, 'r') as f:
+        config = json.loads(f.attrs['model_config'])
+
+    def fix_input_layer(cfg):
+        if isinstance(cfg, dict):
+            if cfg.get('class_name') == 'InputLayer':
+                c = cfg['config']
+                if 'batch_shape' in c:
+                    c['batch_input_shape'] = c.pop('batch_shape')
+                c.pop('optional', None)
+            for v in cfg.values():
+                fix_input_layer(v)
+        elif isinstance(cfg, list):
+            for item in cfg:
+                fix_input_layer(item)
+
+    fix_input_layer(config)
+    from tensorflow.keras.models import model_from_json
+    model = model_from_json(json.dumps(config))
+    model.load_weights(path)
+    return model
+
+model = load_model_compatible("deepfake_model.h5")
 
 #converted_model
 # model = load_model("deepfake_model_fixed.keras")
