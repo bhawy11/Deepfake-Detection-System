@@ -17,7 +17,7 @@ import os
 
 #converted_model
 
-model = load_model("deepfake_model_fixed.keras", compile=False)
+model = load_model("deepfake_model_fixed.keras")
 
 # Load face detector
 face_cascade = cv2.CascadeClassifier(
