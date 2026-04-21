@@ -112,17 +112,15 @@ if uploaded_file is not None:
 '''
 
 
-import os
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
-
 import streamlit as st
 import cv2
 import numpy as np
-import tensorflow as tf
+import os
+import tf_keras
 
 # Load model
 MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'deepfake_model.h5')
-model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+model = tf_keras.models.load_model(MODEL_PATH, compile=False)
 
 # Load face detector
 face_cascade = cv2.CascadeClassifier(
