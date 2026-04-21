@@ -1,3 +1,5 @@
+'''
+
 import streamlit as st
 import cv2
 import numpy as np
@@ -5,6 +7,7 @@ from tensorflow.keras.models import load_model
 
 import gdown
 import os
+
 
 # MODEL_PATH = "deepfake_model.h5"
 
@@ -97,6 +100,71 @@ if uploaded_file is not None:
             img_resized = np.expand_dims(img_resized, axis=0)
 
             # Prediction
+            prediction = model.predict(img_resized)[0][0]
+            st.write("Prediction score:", float(prediction))
+
+            if prediction >= THRESHOLD:
+                st.error("FAKE IMAGE")
+            else:
+                st.success("REAL IMAGE")
+                
+
+'''
+
+
+import os
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
+import streamlit as st
+import cv2
+import numpy as np
+import tensorflow as tf
+
+# Load model
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'deepfake_model.h5')
+model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+
+# Load face detector
+face_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+)
+
+IMG_SIZE = 128
+THRESHOLD = 0.6
+
+st.title("DeepFake Detection System")
+st.warning(
+    "⚠️ This system detects face-swap deepfakes. "
+    "Pure AI-generated images may not always be detected."
+)
+
+uploaded_file = st.file_uploader(
+    "Upload an image", type=["jpg", "jpeg", "png"]
+)
+
+def face_present(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(
+        gray, scaleFactor=1.2, minNeighbors=6, minSize=(60, 60)
+    )
+    return len(faces) > 0
+
+if uploaded_file is not None:
+    file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+    img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+    if img is None:
+        st.error("Unable to read image")
+    else:
+        st.image(img, caption="Uploaded Image", use_column_width=True)
+
+        if not face_present(img):
+            st.error("No human face detected → Possibly AI-generated image")
+        else:
+            img_resized = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+            img_resized = img_resized.astype(np.float32) / 255.0
+            img_resized = np.expand_dims(img_resized, axis=0)
+
             prediction = model.predict(img_resized)[0][0]
             st.write("Prediction score:", float(prediction))
 
