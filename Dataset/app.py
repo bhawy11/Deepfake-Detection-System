@@ -77,6 +77,10 @@ import h5py
 import tensorflow as tf
 
 # Rebuild model architecture exactly (bypasses broken config in .h5 file)
+# def build_model():
+#     model = tf.keras.Sequential([
+
+@st.cache_resource
 def build_model():
     model = tf.keras.Sequential([
         tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
