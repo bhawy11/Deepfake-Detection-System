@@ -1,6 +1,5 @@
 streamlit==1.56.0
 tensorflow==2.16.1
-tf-keras
 opencv-python-headless==4.8.1.78
 gdown==5.2.0
 h5py
